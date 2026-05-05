@@ -222,6 +222,16 @@ Result: Side-by-side venue comparison with total cost projections.
 - `references/wedding-budget-calculator.md` -- Detailed budget template with Israeli cost benchmarks
 - `references/rabbinate-checklist.md` -- Step-by-step Rabbinate registration guide with document checklist
 
+## Reference Links
+
+| Source | URL | What to Check |
+|--------|-----|---------------|
+| Chief Rabbinate of Israel | https://www.gov.il/he/departments/the_chief_rabbinate_of_israel | Current tik nisuin fee, registration documents, oleh discount eligibility |
+| ACUM (music license) | https://www.acum.org.il/ | Current AKUM license tariff for weddings, license application form |
+| Celebrate (vendor platform) | https://celebrate.co.il/ | Verify the platform is still active before recommending |
+| Engaged (vendor platform) | https://www.engaged.co.il/ | Verify the platform is still active before recommending |
+| Save A Date (vendor platform) | https://www.saveadate.co.il/ | Verify the platform is still active before recommending |
+
 ## Gotchas
 
 ### 1. AKUM Fee Surprise
