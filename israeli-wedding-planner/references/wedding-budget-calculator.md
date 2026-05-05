@@ -26,7 +26,7 @@ Use this template to track wedding expenses. All amounts in NIS.
 | Flowers + design | | | | [ ] | |
 | Invitations | | | | [ ] | |
 | Magnets | | | | [ ] | |
-| Rabbinate fee | ~700 | | | [ ] | Fixed |
+| Rabbinate fee | ~710 | | | [ ] | Fixed |
 | Transportation | | | | [ ] | Shuttle bus |
 | Tips | | | | [ ] | DJ, waitstaff, coordinator |
 | Contingency (5-10%) | | | | N/A | For unexpected costs |
@@ -50,7 +50,7 @@ Total cost = (per_plate_price x guest_count) + fixed_costs
 - Makeup: 2,000
 - Flowers: 2,000
 - Invitations + magnets: 1,500
-- Rabbinate: 700
+- Rabbinate: 710
 - Transport + tips: 1,600
 - **Total: ~80,000 NIS**
 
@@ -63,7 +63,7 @@ Total cost = (per_plate_price x guest_count) + fixed_costs
 - Makeup: 3,000
 - Flowers: 5,000
 - Invitations + magnets: 2,500
-- Rabbinate: 700
+- Rabbinate: 710
 - Transport + tips: 3,000
 - **Total: ~129,000 NIS** (negotiate venue to fit 120K)
 
@@ -76,7 +76,7 @@ Total cost = (per_plate_price x guest_count) + fixed_costs
 - Makeup: 4,000
 - Flowers: 8,000
 - Invitations + magnets: 3,000
-- Rabbinate: 700
+- Rabbinate: 710
 - Transport + tips: 5,000
 - **Total: ~198,500 NIS** (negotiate venue or reduce guests to fit 180K)
 
