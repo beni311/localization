@@ -341,11 +341,11 @@ Result: Install next-intl, create `[locale]` route segment, configure middleware
 ## Bundled Resources
 
 ### Scripts
-- `scripts/generate_i18n.py` — Generate Hebrew i18n message files: scaffold translation JSON structure, extract Hebrew plural form templates, produce locale files for react-intl, vue-i18n, and next-intl. Run: `python scripts/generate_i18n.py --help`
+- `scripts/generate_i18n.py`: Generate Hebrew i18n message files. Scaffolds translation JSON structure, extracts Hebrew plural form templates, and produces locale files for react-intl, vue-i18n, and next-intl. Run: `python scripts/generate_i18n.py --help`
 
 ### References
-- `references/pluralization.md` — Complete Hebrew pluralization rules with singular, dual, and plural forms for common word categories (time, quantities, objects), ICU MessageFormat patterns, and edge cases for Hebrew number agreement.
-- `references/bidi.md` — Bidirectional text handling patterns for Hebrew applications: Unicode bidi algorithm overview, HTML dir attribute usage, CSS unicode-bidi properties, framework-specific bidi solutions, and common pitfalls with mixed Hebrew/English/number content.
+- `references/pluralization.md`: Complete Hebrew pluralization rules with singular, dual, and plural forms for common word categories (time, quantities, objects), ICU MessageFormat patterns, and edge cases for Hebrew number agreement.
+- `references/bidi.md`: Bidirectional text handling patterns for Hebrew applications. Unicode bidi algorithm overview, HTML dir attribute usage, CSS unicode-bidi properties, framework-specific bidi solutions, and common pitfalls with mixed Hebrew/English/number content.
 
 ## Gotchas
 - Agents may set `dir="rtl"` only on the body element, but RTL direction must be set at the `<html>` level to properly affect scroll bars, default text alignment, and CSS logical properties.
