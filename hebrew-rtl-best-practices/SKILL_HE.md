@@ -1,12 +1,14 @@
 ---
 name: hebrew-rtl-best-practices
 description: >-
-  Implement right-to-left (RTL) layouts for Hebrew web and mobile applications.
+  Implement right-to-left (RTL) layouts for Hebrew web applications.
   Use when user asks about RTL layout, Hebrew text direction, bidirectional
-  (bidi) text, Hebrew CSS, "right to left", or needs to build Hebrew UI. Covers
-  CSS logical properties, Tailwind RTL, React/Next.js RTL setup, Hebrew typography, and
-  font selection. Do NOT use for Arabic RTL (similar but different typography)
-  unless user explicitly asks for shared RTL patterns.
+  (bidi) text, Hebrew CSS, "right to left", or needs to build a Hebrew web UI. Covers
+  CSS logical properties, the :dir() pseudo-class, Tailwind RTL, React/Next.js RTL setup,
+  icon mirroring, Hebrew typography, and font selection. Do NOT use for Arabic RTL
+  (similar but different typography) unless user explicitly asks for shared RTL
+  patterns, or for native mobile RTL (React Native I18nManager, SwiftUI, Android)
+  which is out of scope.
 license: MIT
 compatibility: 'Works with Claude Code, Claude.ai, Cursor. No network required.'
 ---
@@ -41,6 +43,18 @@ compatibility: 'Works with Claude Code, Claude.ai, Cursor. No network required.'
 
 ככה הפריסה משתקפת אוטומטית במצב RTL.
 
+כשבאמת צריך כלל שתלוי בכיוון שתכונות לוגיות לא יכולות לבטא, עדיף להשתמש בפסבדו-קלאס `:dir()` במקום בסלקטורים על תכונת `[dir="rtl"]`:
+
+```css
+/* מודרני: מתאים לכיוון המחושב, כולל dir="auto" וירושה */
+.chevron:dir(rtl) { transform: scaleX(-1); }
+
+/* גישה ישנה: מתאים רק לתכונת dir מפורשת על האלמנט או מעליו */
+[dir="rtl"] .chevron { transform: scaleX(-1); }
+```
+
+הפסבדו-קלאס `:dir()` הוא חלק מ-Selectors Level 4 והוא פותר את הכיוון *המחושב*, אז הוא עובד גם לאלמנטים שהכיוון שלהם מגיע מ-`dir="auto"` או מאב קדמון, איפה שסלקטור תכונה היה מפספס אותם. תמיכת דפדפנים: כרום ו-Edge הוסיפו אותו בגרסה 120 (סוף 2023), פיירפוקס תומך בו כבר שנים, וספארי הוסיף אותו ב-16.4. לתמיכה בדפדפנים ישנים, כדאי לשמור כלל גיבוי עם `[dir="rtl"]` או להשתמש בתכונה לוגית במקום. אפשר לבדוק תמיכה עדכנית בכתובת https://caniuse.com/css-dir-pseudo.
+
 ### שלב 3: טיפול בטקסט דו-כיווני
 כשמשלבים עברית עם אנגלית/מספרים:
 
@@ -60,9 +74,55 @@ compatibility: 'Works with Claude Code, Claude.ai, Cursor. No network required.'
 בעיות bidi נפוצות:
 - מספרי טלפון מופיעים הפוך: עוטפים ב-`<bdo dir="ltr">`
 - סימני פיסוק בקצה הלא נכון של המשפט: משתמשים ב-`unicode-bidi: isolate`
-- כתובות URL/אימייל בתוך טקסט עברי: עוטפים ב-`<span dir="ltr">`
+- כתובות URL ואימייל בתוך טקסט עברי: עוטפים ב-`<span dir="ltr">`
 
-### שלב 4: טיפוגרפיה עברית
+מספרים ותאריכים: מספרים בודדים ותאריכים בפורמט `DD/MM/YYYY` בתוך טקסט עברי בדרך כלל מוצגים תקין כי ספרות הן חלשות-LTR, אבל מספר שאחריו מיד סימן, מטבע או מספר שני עלול להתהפך. כשערך חייב לשמור על סדר ויזואלי קבוע, בודדו אותו עם `<span dir="ltr">` או `unicode-bidi: isolate` במקום לסמוך על פתרון ה-bidi הדיפולטי.
+
+האלמנט `<bdi>` מול `<bdo>`: השתמשו ב-`<bdo dir="ltr">` רק כשרוצים *לכפות* כיוון (הוא דורס את אלגוריתם ה-bidi). לתוכן שנוצר על ידי משתמשים או תוכן בכיוון לא ידוע, עדיף `<bdi>`, שמבודד את התוכן כך שהכיוון שלו מזוהה אוטומטית ולא יכול לדלוף לטקסט שמסביב:
+
+```html
+<!-- שם המשתמש יכול להיות בעברית או בלטינית; bdi מבודד אותו כך או כך -->
+<p>שלום, <bdi>{{ userName }}</bdi>, ברוך הבא</p>
+```
+
+לשדות טקסט חופשי, `dir="auto"` (או `unicode-bidi: plaintext` ב-CSS) נותן לדפדפן לבחור את כיוון הבסיס לכל ערך, וזו ברירת המחדל הנכונה לתגובות, שמות ומחרוזות חיפוש שבהן לא יודעים מראש את השפה.
+
+צללים וגרדיאנטים לא מתהפכים אוטומטית. תכונות CSS לוגיות משקפות פריסה, אבל היסטים וזוויות של `box-shadow`, `text-shadow` ו-`linear-gradient` הם פיזיים ונשארים קבועים כשהכיוון מתהפך. היסט צל של `4px 4px` שנראה תקין ב-LTR יצביע לכיוון "הלא נכון" ביחס לפריסת RTL. הפכו אותם במפורש עם דריסת `:dir(rtl)` (או `[dir="rtl"]`) כשהכיוון שלהם משמעותי.
+
+### שלב 4: שיקוף אייקונים כיווניים
+
+שיקוף אייקונים הוא אחד הבאגים הנפוצים ביותר ב-RTL. הכלל: לשקף אייקונים שהמשמעות שלהם קשורה לכיוון הקריאה, ולהשאיר את כל השאר במקום.
+
+לשקף את אלה (הכיוון שלהם מקודד "קדימה/אחורה/הבא/הקודם" ביחס לסדר הקריאה):
+- חצי ניווט, כפתורי קדימה ואחורה, שברונים בפירורי לחם
+- חצי "שליחה" והגשה, חצי קרוסלה ועימוד
+- חצי הזחה, קינון רשימות ותגובה
+- מחווני התקדמות שמרמזים על תנועה קדימה
+
+אל תשקפו את אלה (שיקוף הופך אותם לשגויים או לא מזוהים):
+- לוגואים וסמלי מותג
+- סימני וי וסימני X או סגירה
+- כפתורי הפעלה של מדיה (כפתור הפעלה תמיד מצביע ימינה, הוא מתייחס לציר הזמן ולא לכיוון הקריאה)
+- שעונים ואייקוני שעון אנלוגי (כיוון השעון אוניברסלי)
+- אייקונים שמתארים עצמים מהעולם האמיתי עם כיוון קבוע (שפופרת טלפון, זכוכית מגדלת עם ידית, רוב אייקוני המוצר)
+
+טכניקה, שיקוף עם טרנספורם היפוך אופקי:
+
+```css
+/* היפוך רק כשכיוון המסמך הוא RTL */
+.icon-directional:dir(rtl) { transform: scaleX(-1); }
+```
+
+```html
+<!-- Tailwind: variant של rtl: למקרים שתכונות לוגיות לא מכסות -->
+<button class="rtl:-scale-x-100">
+  <ArrowLeftIcon />
+</button>
+```
+
+הרבה ערכות אייקונים (למשל Material Symbols) כבר מספקות וריאנטים מודעי-RTL, עדיף אותם על פני היפוך כשהם זמינים, כי אייקון הפוך עלול לעוות פרטים עדינים או טקסט מוטמע.
+
+### שלב 5: טיפוגרפיה עברית
 מחסנית גופנים מומלצת:
 ```css
 font-family: 'Heebo', 'Assistant', 'Rubik', 'Noto Sans Hebrew', sans-serif;
@@ -78,7 +138,7 @@ body[dir="rtl"] {
 }
 ```
 
-### שלב 5: הגדרה לפי פריימוורק
+### שלב 6: הגדרה לפי פריימוורק
 
 **Tailwind CSS RTL (v3.3+ / v4):**
 
@@ -135,14 +195,17 @@ export default async function RootLayout({
 }
 ```
 
-`next/font` שומר את הגופן מקומית (בלי בקשות חיצוניות ל-Google Fonts, בלי הזזת פריסה).
+החבילה `next/font` שומרת את הגופן מקומית (בלי בקשות חיצוניות ל-Google Fonts, בלי הזזת פריסה).
 
 **React עם MUI:**
+
+גרסאות MUI v6 ו-v7 משתמשות בפיצול הרשמי `@mui/stylis-plugin-rtl`, ולא בחבילת הקהילה הישנה `stylis-plugin-rtl`. הפיצול הרשמי מתקן בעיות עם CSS layers ותומך בגרסאות Stylis עדכניות.
+
 ```jsx
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-import rtlPlugin from 'stylis-plugin-rtl';
+import { rtlPlugin } from '@mui/stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 
 const cacheRtl = createCache({
@@ -153,14 +216,17 @@ const cacheRtl = createCache({
 const theme = createTheme({ direction: 'rtl' });
 ```
 
-### שלב 6: מלכודות נפוצות שכדאי לבדוק
-1. אייקונים עם משמעות כיוונית (חצים, כפתורי חזרה) - צריך לשקף
+כדאי לאמת את שם הייבוא המדויק ואת ההגדרה מול מדריך ה-RTL העדכני של MUI (https://mui.com/material-ui/customization/right-to-left/) לגרסת ה-MUI שלכם.
+
+### שלב 7: מלכודות נפוצות שכדאי לבדוק
+1. אייקונים כיווניים - צריך לשקף (ראו שלב 4 לאילו אייקונים להפוך ואילו להשאיר)
 2. פסי התקדמות - צריכים להתמלא מימין לשמאל
-3. סליידרים/קרוסלות - כיוון ההחלקה צריך להתהפך
+3. סליידרים וקרוסלות - כיוון ההחלקה צריך להתהפך
 4. תוויות טפסים - צריכות להיות מיושרות לימין
 5. פירורי לחם (breadcrumbs) - כיוון המפריד צריך להתהפך
 6. טבלאות - יישור כותרות ותאים
 7. גרפים - יכול להיות שציר ה-X צריך להתהפך לקוראים בעברית
+8. צללים וגרדיאנטים - היסטים וזוויות פיזיים לא מתהפכים אוטומטית (ראו שלב 3)
 
 ## דוגמאות
 
@@ -224,18 +290,22 @@ const theme = createTheme({ direction: 'rtl' });
 - `references/css-logical-properties.md` - טבלת מיפוי מלאה מתכונות CSS פיזיות ללוגיות (margin, padding, border, מיקום, יישור טקסט, גדלים) בתוספת המלצות למחסניות גופנים עבריים ל-sans-serif, serif ו-monospace. תסתכלו בו כשממירים גיליון סגנונות LTR לתכונות לוגיות תואמות RTL או בוחרים גופני ווב עבריים.
 
 ## מלכודות נפוצות
-- CSS text-align: left הוא שגוי לעברית. תשתמשו ב-text-align: start שמכבד את כיוון המסמך. סוכנים נוטים לקודד יישור left ב-CSS.
-- margin-left ו-padding-right לא מתהפכים במצב RTL. תשתמשו בתכונות CSS לוגיות: margin-inline-start ו-padding-inline-end במקום. סוכנים שאומנו על CSS של LTR ייצרו תכונות פיזיות.
-- כיוון row ב-Flexbox מתהפך אוטומטית ב-RTL, אבל row-reverse גם מתהפך, מה שגורם להיפוך כפול וחזרה לסדר LTR. סוכנים עלולים להוסיף row-reverse כי הם חושבים שזה יוצר RTL, אבל בפועל זה יוצר LTR בתוך הקשר RTL.
-- מספרי טלפון, מספרי כרטיסי אשראי וקטעי קוד חייבים להישאר LTR גם בתוך מיכלים RTL. תעטפו אותם ב-bdo dir="ltr" או תשתמשו ב-direction: ltr על האלמנט המכיל. סוכנים לפעמים נותנים להם לרשת RTL.
+- הכלל `text-align: left` שגוי לעברית. תשתמשו ב-`text-align: start` שמכבד את כיוון המסמך. סוכנים נוטים לקודד יישור `left` ב-CSS.
+- התכונות `margin-left` ו-`padding-right` לא מתהפכות במצב RTL. תשתמשו בתכונות CSS לוגיות: `margin-inline-start` ו-`padding-inline-end` במקום. סוכנים שאומנו על CSS של LTR ייצרו תכונות פיזיות.
+- כיוון `row` ב-Flexbox מתהפך אוטומטית ב-RTL, אבל `row-reverse` גם מתהפך, מה שגורם להיפוך כפול וחזרה לסדר LTR. סוכנים עלולים להוסיף `row-reverse` כי הם חושבים שזה יוצר RTL, אבל בפועל זה יוצר LTR בתוך הקשר RTL.
+- מספרי טלפון, מספרי כרטיסי אשראי וקטעי קוד חייבים להישאר LTR גם בתוך מיכלים RTL. תעטפו אותם ב-`<bdo dir="ltr">` או תשתמשו ב-`direction: ltr` על האלמנט המכיל. סוכנים לפעמים נותנים להם לרשת RTL.
 
 ## קישורי עזר
 
 | מקור | כתובת | מה לבדוק |
 |------|-------|----------|
 | MDN תכונות CSS לוגיות | https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values | רשימת תכונות מלאה, טבלאות תמיכת דפדפנים |
+| MDN פסבדו-קלאס `:dir()` | https://developer.mozilla.org/en-US/docs/Web/CSS/:dir | תחביר, התנהגות מול סלקטורים על תכונת `[dir]` |
+| Can I use: `:dir()` | https://caniuse.com/css-dir-pseudo | טבלת תמיכת דפדפנים עדכנית |
+| MDN אלמנט `<bdi>` | https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/bdi | בידוד תוכן דו-כיווני שנוצר על ידי משתמשים |
 | תמיכת RTL ב-Tailwind CSS | https://tailwindcss.com/docs/hover-focus-and-other-states#rtl-support | תחביר variants של `rtl:` / `ltr:` |
 | תכונות לוגיות ב-Tailwind | https://tailwindcss.com/docs/margin#logical-properties | כלי `ms-*`, `me-*`, `ps-*`, `pe-*` |
+| MUI ימין לשמאל | https://mui.com/material-ui/customization/right-to-left/ | הגדרת `@mui/stylis-plugin-rtl` ל-MUI עדכני |
 | Google Fonts עברית | https://fonts.google.com/?subset=hebrew | משפחות גופנים עבריים זמינות |
 | W3C בינלאומיות | https://www.w3.org/International/articles/inline-bidi-markup/ | אלגוריתם bidi של Unicode, שיטות עבודה מומלצות |
 
@@ -243,8 +313,8 @@ const theme = createTheme({ direction: 'rtl' });
 
 ### שגיאה: "יישור הטקסט נראה שגוי"
 סיבה: שימוש ב-`text-align: left` במקום ב-`text-align: start`
-פתרון: תחליפו כל `left`/`right` ב-text-align ל-`start`/`end`.
+פתרון: תחליפו כל `left` ו-`right` ב-`text-align` ל-`start` ו-`end`.
 
 ### שגיאה: "הפריסה לא משתקפת"
-סיבה: שימוש ב-margin/padding פיזיים במקום בתכונות לוגיות
-פתרון: תחליפו כל `margin-left`/`margin-right` ב-`margin-inline-start`/`margin-inline-end`.
+סיבה: שימוש ב-`margin` ו-`padding` פיזיים במקום בתכונות לוגיות
+פתרון: תחליפו כל `margin-left` ו-`margin-right` ב-`margin-inline-start` ו-`margin-inline-end`.

@@ -59,7 +59,7 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import mm
-from bidi.algorithm import get_display
+from bidi import get_display  # python-bidi 0.6.x; see note below
 
 # Register Hebrew font
 pdfmetrics.registerFont(TTFont('Heebo', 'Heebo-Regular.ttf'))
@@ -90,6 +90,23 @@ Key points for reportlab Hebrew:
 - Use `drawRightString()` for right-aligned RTL text
 - Register TTF Hebrew fonts explicitly -- reportlab has no built-in Hebrew support
 - Set line height to at least 1.5x font size for Hebrew readability
+- **python-bidi import:** since python-bidi 0.5.0 the canonical import is `from bidi import get_display` (the old `from bidi.algorithm import get_display` path was removed). Current python-bidi is 0.6.x, which restored a parallel algorithm module but kept the top-level import as the recommended one. python-bidi 0.6.x also dropped support for Python below 3.9.
+- **Multi-line text:** `drawRightString()` draws a single line and does NOT wrap. For any body text longer than one line, use reportlab's `Paragraph` flowable (from `reportlab.platypus`) with a right-aligned, RTL `ParagraphStyle` instead. The bundled `scripts/generate_doc.py` uses per-line `drawRightString` for compact fixed-layout documents (invoices, receipts); it will clip long Hebrew strings. Reach for `Paragraph` / platypus flowables for contracts or any wrapping body copy.
+
+### Mixed Hebrew / Latin / Digit Lines
+
+The single most common RTL failure in generated documents is a line that mixes a Hebrew description with LTR numbers and a currency symbol, for example an invoice line item. `get_display()` handles the bidi reordering, but you must pass the *whole logical string* in one call so the algorithm sees the full context:
+
+```python
+from bidi import get_display
+
+# Logical order: Hebrew description, then qty, unit price, currency
+line = 'ייעוץ טכני (3 שעות) - 1,500.00 ש"ח'
+c.setFont('Heebo', 11)
+c.drawRightString(width - 20 * mm, y, get_display(line))
+```
+
+The digits, the comma, the period, and the parentheses all stay in their correct LTR positions because the bidi algorithm resolves them relative to the surrounding Hebrew. Do NOT split the line into pieces and reorder them yourself, and do NOT call `get_display()` on the Hebrew part only, both approaches break the number ordering.
 
 ### Step 4: Generate Hebrew PDF with WeasyPrint
 
@@ -265,13 +282,30 @@ Result: Read CSV data, iterate rows, use `scripts/generate_doc.py` to produce in
 ## Bundled Resources
 
 ### Scripts
-- `scripts/generate_doc.py` — Generate Hebrew PDF documents with reportlab: register Hebrew fonts, apply RTL text reordering with python-bidi, produce Israeli business documents (invoices, receipts) with proper VAT calculations and NIS formatting. Run: `python scripts/generate_doc.py --help`
+- `scripts/generate_doc.py` - Generate Hebrew PDF documents with reportlab: register Hebrew fonts, apply RTL text reordering with python-bidi, produce Israeli business documents (invoices, receipts) with proper VAT calculations and NIS formatting. Run: `python scripts/generate_doc.py --help`
 
 ### References
-- `references/hebrew-fonts.md` — Hebrew font catalog with recommended fonts for different document types (sans-serif, serif, monospace), Google Fonts download links, system font availability matrix, font pairing suggestions, and installation instructions for macOS, Linux, and Windows.
-- `references/templates.md` — Israeli business document templates with required fields per document type (tax invoice, contract, proposal, receipt, meeting minutes), Israeli legal requirements for invoices, VAT rules, and standard Hebrew business phrasing.
+- `references/hebrew-fonts.md` - Hebrew font catalog with recommended fonts for different document types (sans-serif, serif, monospace), Google Fonts download links, system font availability matrix, font pairing suggestions, and installation instructions for macOS, Linux, and Windows.
+- `references/templates.md` - Israeli business document templates with required fields per document type (tax invoice, contract, proposal, receipt, meeting minutes), Israeli legal requirements for invoices, VAT rules, and standard Hebrew business phrasing.
+
+## Reference Links
+
+| Source | URL | What to Check |
+|--------|-----|---------------|
+| reportlab documentation | https://docs.reportlab.com/ | Canvas API, platypus flowables, font registration |
+| WeasyPrint documentation | https://doc.courtbouillon.org/weasyprint/stable/ | HTML/CSS to PDF, RTL support, @font-face |
+| python-docx documentation | https://python-docx.readthedocs.io/ | Document model, runs, paragraph properties |
+| python-bidi (PyPI) | https://pypi.org/project/python-bidi/ | Current version, import path, changelog |
+| Israeli tax invoice requirements | https://he.wikipedia.org/wiki/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA_%D7%9E%D7%A1 | Mandatory fields for a Heshbonit Mas; cross-check against current Israel Tax Authority rules |
+
+For binding legal requirements always confirm against the current Israel Tax Authority (Rashut HaMisim) guidance, the Wikipedia entry is a starting orientation, not the authority.
+
+## Recommended MCP Servers
+
+No MCP server applies to this skill. Hebrew document generation runs entirely through local Python and Node libraries (reportlab, WeasyPrint, python-docx, pptxgenjs); there is no external service to wrap as an MCP server. Use the bundled scripts and the code in the Instructions section directly.
 
 ## Gotchas
+- `get_display()` must be applied per line at draw time, immediately before `drawRightString()`, NOT once on a whole multi-line document or block. The bidi algorithm is not idempotent: running it on text that was already reordered double-reverses the characters and produces scrambled output. A common agent mistake is to "pre-process" a whole list of lines through `get_display()` and then call it again inside the draw loop.
 - PDF generators often default to left-to-right text flow. Hebrew documents MUST use RTL paragraph direction, and mixed Hebrew-English text requires proper BiDi (bidirectional) algorithm support.
 - Agents may pick fonts that lack Hebrew character support (e.g., Arial works, but many decorative Latin fonts do not). Always verify the font includes the Hebrew Unicode range (U+0590-U+05FF).
 - Hebrew date formatting uses DD/MM/YYYY in secular context and Hebrew calendar dates (e.g., 15 Adar 5786) for religious/traditional documents. Agents may default to MM/DD/YYYY.

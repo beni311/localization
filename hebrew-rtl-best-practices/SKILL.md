@@ -1,6 +1,6 @@
 ---
 name: hebrew-rtl-best-practices
-description: Implement right-to-left (RTL) layouts for Hebrew web and mobile applications. Use when user asks about RTL layout, Hebrew text direction, bidirectional (bidi) text, Hebrew CSS, "right to left", or needs to build Hebrew UI. Covers CSS logical properties, Tailwind RTL, React/Next.js RTL setup, Hebrew typography, and font selection. Do NOT use for Arabic RTL (similar but different typography) unless user explicitly asks for shared RTL patterns.
+description: Implement right-to-left (RTL) layouts for Hebrew web applications. Use when user asks about RTL layout, Hebrew text direction, bidirectional (bidi) text, Hebrew CSS, "right to left", or needs to build a Hebrew web UI. Covers CSS logical properties, the :dir() pseudo-class, Tailwind RTL, React/Next.js RTL setup, icon mirroring, Hebrew typography, and font selection. Do NOT use for Arabic RTL (similar but different typography) unless user explicitly asks for shared RTL patterns, or for native mobile RTL (React Native I18nManager, SwiftUI, Android) which is out of scope.
 license: MIT
 compatibility: Works with Claude Code, Claude.ai, Cursor. No network required.
 ---
@@ -35,6 +35,18 @@ NEVER use physical directional properties for layout:
 
 This ensures the layout automatically mirrors in RTL mode.
 
+When you genuinely need a direction-specific rule that logical properties cannot express, prefer the `:dir()` pseudo-class over `[dir="rtl"]` attribute selectors:
+
+```css
+/* Modern: matches the resolved direction, including dir="auto" and inheritance */
+.chevron:dir(rtl) { transform: scaleX(-1); }
+
+/* Older approach: only matches an explicit dir attribute on/above the element */
+[dir="rtl"] .chevron { transform: scaleX(-1); }
+```
+
+`:dir()` is part of Selectors Level 4 and resolves the *computed* direction, so it also works for elements whose direction comes from `dir="auto"` or from an ancestor, where an attribute selector would miss them. Browser support: Chrome and Edge shipped it in version 120 (late 2023), Firefox has supported it for years, and Safari added it in 16.4. For older-browser support, keep an `[dir="rtl"]` fallback rule or use a logical property instead. Check current support at https://caniuse.com/css-dir-pseudo.
+
 ### Step 3: Handle Bidirectional Text
 When mixing Hebrew and English/numbers:
 
@@ -56,7 +68,53 @@ Common bidi issues:
 - Punctuation at wrong end of sentence: Use `unicode-bidi: isolate`
 - URLs/emails in Hebrew text: Wrap in `<span dir="ltr">`
 
-### Step 4: Hebrew Typography
+**Numbers and dates:** Standalone numbers and DD/MM/YYYY dates inside Hebrew text usually render fine because digits are weak-LTR, but a number that is immediately followed by a sign, currency, or a second number can flip. When a value must keep a fixed visual order, isolate it with `<span dir="ltr">` or `unicode-bidi: isolate` rather than trusting the default bidi resolution.
+
+**`<bdi>` vs `<bdo>`:** use `<bdo dir="ltr">` only when you want to *force* a direction (it overrides the bidi algorithm). For user-generated or unknown-direction content, prefer `<bdi>`, which *isolates* the content so its direction is auto-detected and cannot leak into the surrounding text:
+
+```html
+<!-- User name could be Hebrew or Latin; bdi isolates it either way -->
+<p>שלום, <bdi>{{ userName }}</bdi>, ברוך הבא</p>
+```
+
+For free-text fields, `dir="auto"` (or `unicode-bidi: plaintext` in CSS) lets the browser pick the base direction per value, which is the correct default for comments, names, and search queries where you do not know the language in advance.
+
+**Shadows and gradients do not auto-flip.** CSS logical properties mirror layout, but `box-shadow`, `text-shadow`, and `linear-gradient` offsets/angles are physical and stay fixed when direction flips. A shadow offset of `4px 4px` that looks correct in LTR will point the "wrong" way relative to an RTL layout. Flip these explicitly with a `:dir(rtl)` (or `[dir="rtl"]`) override when their direction is meaningful.
+
+### Step 4: Mirror Directional Icons
+
+Icon mirroring is one of the highest-frequency RTL bugs. The rule: mirror icons whose meaning is tied to reading direction, leave everything else alone.
+
+**Mirror these** (their direction encodes "forward/back/next/previous" relative to reading order):
+- Navigation arrows, back/forward buttons, breadcrumb chevrons
+- "Send" / submit arrows, carousel and pagination arrows
+- Indentation, list-nesting, and reply arrows
+- Progress indicators that imply forward motion
+
+**Do NOT mirror these** (mirroring makes them wrong or unrecognizable):
+- Logos and brand marks
+- Checkmarks and X / close icons
+- Media play buttons (a play button always points right, it refers to the timeline, not reading direction)
+- Clocks and analog-time icons (clockwise is universal)
+- Icons depicting real-world objects with a fixed orientation (a phone handset, a magnifying glass with the handle, most product icons)
+
+Technique, mirror with a horizontal flip transform:
+
+```css
+/* Flip only when the document direction is RTL */
+.icon-directional:dir(rtl) { transform: scaleX(-1); }
+```
+
+```html
+<!-- Tailwind: rtl: variant for the cases logical properties cannot cover -->
+<button class="rtl:-scale-x-100">
+  <ArrowLeftIcon />
+</button>
+```
+
+Many icon sets (for example Material Symbols) already ship RTL-aware variants, prefer those over flipping when available, because a flipped icon can mis-render fine detail or embedded text.
+
+### Step 5: Hebrew Typography
 Recommended font stack:
 ```css
 font-family: 'Heebo', 'Assistant', 'Rubik', 'Noto Sans Hebrew', sans-serif;
@@ -72,7 +130,7 @@ body[dir="rtl"] {
 }
 ```
 
-### Step 5: Framework-Specific Setup
+### Step 6: Framework-Specific Setup
 
 **Tailwind CSS RTL (v3.3+ / v4):**
 
@@ -132,11 +190,14 @@ export default async function RootLayout({
 `next/font` self-hosts the font (no external Google Fonts requests, zero layout shift).
 
 **React with MUI:**
+
+MUI v6 and v7 use the official fork `@mui/stylis-plugin-rtl`, not the older community `stylis-plugin-rtl` package. The official fork fixes CSS-layers issues and supports current Stylis versions.
+
 ```jsx
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-import rtlPlugin from 'stylis-plugin-rtl';
+import { rtlPlugin } from '@mui/stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 
 const cacheRtl = createCache({
@@ -147,14 +208,17 @@ const cacheRtl = createCache({
 const theme = createTheme({ direction: 'rtl' });
 ```
 
-### Step 6: Common Pitfalls to Check
-1. Icons with directional meaning (arrows, back buttons) -- mirror them
+Confirm the exact import name and setup against the current MUI RTL guide (https://mui.com/material-ui/customization/right-to-left/) for your MUI version.
+
+### Step 7: Common Pitfalls to Check
+1. Directional icons -- mirror them (see Step 4 for which icons to flip and which to leave)
 2. Progress bars -- should fill from right to left
 3. Sliders/carousels -- swipe direction should reverse
 4. Form labels -- should be right-aligned
 5. Breadcrumbs -- separator direction should reverse
 6. Tables -- header alignment and cell alignment
 7. Charts -- x-axis may need to reverse for Hebrew readers
+8. Shadows and gradients -- physical offsets/angles do not auto-flip (see Step 3)
 
 ## Examples
 
@@ -215,7 +279,7 @@ User says: "My sidebar is on the wrong side in Hebrew"
 ## Bundled Resources
 
 ### References
-- `references/css-logical-properties.md` — Complete physical-to-logical CSS property mapping table (margin, padding, border, positioning, text alignment, sizing) plus Hebrew font stack recommendations for sans-serif, serif, and monospace. Consult when converting any LTR stylesheet to RTL-compatible logical properties or choosing Hebrew web fonts.
+- `references/css-logical-properties.md` - Complete physical-to-logical CSS property mapping table (margin, padding, border, positioning, text alignment, sizing) plus Hebrew font stack recommendations for sans-serif, serif, and monospace. Consult when converting any LTR stylesheet to RTL-compatible logical properties or choosing Hebrew web fonts.
 
 ## Gotchas
 - CSS `text-align: left` is wrong for Hebrew. Use `text-align: start` which respects the document direction. Agents frequently hardcode `left` alignment in CSS.
@@ -228,8 +292,12 @@ User says: "My sidebar is on the wrong side in Hebrew"
 | Source | URL | What to Check |
 |--------|-----|---------------|
 | MDN CSS Logical Properties | https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values | Full property list, browser support tables |
+| MDN `:dir()` pseudo-class | https://developer.mozilla.org/en-US/docs/Web/CSS/:dir | Syntax, behavior vs `[dir]` attribute selectors |
+| Can I use: `:dir()` | https://caniuse.com/css-dir-pseudo | Current browser support table |
+| MDN `<bdi>` element | https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/bdi | Isolating user-generated bidi content |
 | Tailwind CSS RTL Support | https://tailwindcss.com/docs/hover-focus-and-other-states#rtl-support | `rtl:` / `ltr:` variant syntax |
 | Tailwind Logical Properties | https://tailwindcss.com/docs/margin#logical-properties | `ms-*`, `me-*`, `ps-*`, `pe-*` utilities |
+| MUI Right-to-left | https://mui.com/material-ui/customization/right-to-left/ | `@mui/stylis-plugin-rtl` setup for current MUI |
 | Google Fonts Hebrew | https://fonts.google.com/?subset=hebrew | Available Hebrew font families |
 | W3C Internationalization | https://www.w3.org/International/articles/inline-bidi-markup/ | Unicode bidi algorithm, markup best practices |
 

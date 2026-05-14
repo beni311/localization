@@ -77,7 +77,47 @@ def preprocess_hebrew(text):
     return text
 ```
 
-### Step 4: Handle Hebrew-Specific Challenges
+### Step 4: Nikud Restoration (Diacritization)
+
+The preprocessing above *removes* nikud. The opposite task, *adding* nikud back to unvocalized text, is called diacritization and is its own core Hebrew NLP problem (useful for text-to-speech, language learning, liturgical text, and disambiguation).
+
+Dicta's Nakdan is the standard tool. The character-level model is published on HuggingFace:
+
+```python
+from transformers import AutoModel, AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained('dicta-il/dictabert-large-char-menaked')
+model = AutoModel.from_pretrained('dicta-il/dictabert-large-char-menaked', trust_remote_code=True)
+model.eval()
+
+# The model exposes a `predict` helper that returns vocalized text
+vocalized = model.predict(['שלום עולם'], tokenizer)
+```
+
+Notes:
+- `trust_remote_code=True` is required because the model ships a custom `predict` head. Review the model card before enabling it.
+- Diacritization is ambiguous: the same consonantal text can have multiple valid vocalizations depending on context. Treat output as a best guess, not ground truth.
+- For full sentence-level vocalization with morphological context, Dicta's hosted Nakdan (see Step 6) generally outperforms a raw character model.
+
+### Step 5: Hosted Dicta REST APIs
+
+If you do not want to run models locally, Dicta exposes its tools (Nakdan, morphology, and more) as hosted web services. This suits low-volume use, prototyping, or environments without a GPU.
+
+- Nakdan (diacritization): https://nakdan.dicta.org.il/
+- Developer access and API details: https://dicta.org.il/developers
+
+Verify the current endpoint shape, request format, rate limits, and terms of use on the developer page before integrating, as hosted API contracts change. Do not assume an endpoint URL or payload schema, consult the official developer docs.
+
+### Step 6: Alternative NLP Entry Points
+
+Dicta and ivrit.ai are the primary Hebrew-specific stacks, but two general NLP frameworks also ship Hebrew pipelines:
+
+- **HebSpacy** (https://github.com/8400TheHealthNetwork/HebSpacy): a spaCy pipeline for Hebrew with tokenization, POS, lemmatization, and NER. Good when you already use spaCy and want a single API.
+- **Stanza** (https://stanfordnlp.github.io/stanza/): Stanford's NLP toolkit ships a Hebrew model with tokenization, morphology, lemmatization, and dependency parsing. Good for academic / cross-lingual pipelines.
+
+For best Hebrew accuracy, Dicta models still lead. Use these frameworks when integration convenience outweighs raw quality.
+
+### Step 7: Handle Hebrew-Specific Challenges
 - **Morphological analysis:** Use Dicta morphological analyzer for accurate word segmentation
 - **No capital letters:** Hebrew has no upper/lowercase distinction -- NER is harder
 - **Right-to-left in code:** Ensure proper bidi handling in string operations
@@ -110,7 +150,11 @@ Result: Use DictaBERT-NER model, demonstrate with example text.
 | AlephBERT on HuggingFace | https://huggingface.co/onlplab/alephbert-base | AlephBERT model card and usage |
 | ivrit.ai project site | https://www.ivrit.ai/en/ | Dataset size, license, research papers |
 | NNLP-IL (Israeli NLP community) | https://github.com/NNLP-IL | Curated list of Hebrew NLP resources and benchmarks |
-| DictaLM 3.0 paper (Dicta) | https://arxiv.org/pdf/2309.14568 | Architecture, training data, eval results |
+| DictaLM 3.0 Technical Report (Dicta) | https://dicta.org.il/publications/DictaLM_3_0___Techincal_Report.pdf | Architecture, base-model lineage, training data, eval results |
+| Dicta Nakdan (diacritization) | https://nakdan.dicta.org.il/ | Hosted nikud restoration tool |
+| Dicta developer access | https://dicta.org.il/developers | Hosted REST API details and terms |
+| HebSpacy (spaCy for Hebrew) | https://github.com/8400TheHealthNetwork/HebSpacy | spaCy Hebrew pipeline, install instructions |
+| Stanza (Hebrew model) | https://stanfordnlp.github.io/stanza/ | Hebrew tokenization, morphology, parsing |
 
 ## Gotchas
 - Hebrew has no capital letters, so agents cannot use capitalization-based NER (Named Entity Recognition) heuristics that work for English. Hebrew NER requires morphological analysis or trained models.

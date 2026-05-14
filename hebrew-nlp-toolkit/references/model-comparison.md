@@ -3,7 +3,12 @@
 ## Model Overview
 
 ### DictaLM 3.0 (DICTA, released Dec 2025)
-DictaLM 3.0 is the current Hebrew LLM family from the Dicta Institute. The 24B variants are initialized from Mistral-Small-3.1-24B-Base-2503; the Nemotron 12B variant is initialized from an NVIDIA Nemotron base.
+DictaLM 3.0 is the current Hebrew LLM family from the Dicta Institute. Base-model lineage per the DictaLM 3.0 Technical Report:
+- The **24B** variants are initialized from Mistral-Small-3.1-24B-Base-2503.
+- The **Nemotron 12B** variant is initialized from an NVIDIA Nemotron Nano v2 12B base (a hybrid Mamba/Transformer base).
+- The **1.7B** variant is initialized from Qwen3-1.7B-Base. It is NOT Nemotron-derived.
+
+All three sizes were continuously pre-trained on roughly 100B Hebrew tokens mixed with about 30B tokens of other data.
 - **Variants published on HuggingFace:**
   - `dicta-il/DictaLM-3.0-24B-Base` (24B, BF16) -- strongest open Hebrew model
   - `dicta-il/DictaLM-3.0-24B-Thinking` (24B) -- reasoning model, emits explicit thinking block

@@ -30,10 +30,12 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from bidi.algorithm import get_display
+    # python-bidi 0.5.0+ exposes get_display at the top level.
+    # The old `from bidi.algorithm import get_display` path was removed.
+    from bidi import get_display
 except ImportError:
     print("Missing required dependency. Install with:", file=sys.stderr)
-    print("  pip install python-bidi", file=sys.stderr)
+    print("  pip install python-bidi  # 0.6.x, requires Python 3.9+", file=sys.stderr)
     sys.exit(1)
 
 

@@ -28,13 +28,16 @@ except ImportError:
     sys.exit(1)
 
 
-def preprocess_for_hebrew_ocr(image_path, block_size=31, c_value=10):
+def preprocess_for_hebrew_ocr(image_path, block_size=31, c_value=10,
+                              enhance=False):
     """Preprocess a scanned Israeli form for optimal Hebrew OCR.
 
     Args:
         image_path: Path to the scanned image file.
         block_size: Block size for adaptive thresholding (must be odd).
         c_value: Constant subtracted from adaptive threshold mean.
+        enhance: If True, apply CLAHE contrast enhancement before
+            binarization (helps low-quality or faded scans).
 
     Returns:
         Preprocessed image as a numpy array (grayscale, binarized).
@@ -48,6 +51,10 @@ def preprocess_for_hebrew_ocr(image_path, block_size=31, c_value=10):
 
     # Deskew -- Israeli forms are often slightly rotated from scanning
     gray = deskew_image(gray)
+
+    # Optional CLAHE contrast enhancement -- helps faded / low-contrast scans
+    if enhance:
+        gray = enhance_contrast(gray)
 
     # Binarize with adaptive threshold -- handles uneven lighting
     binary = cv2.adaptiveThreshold(
@@ -157,8 +164,11 @@ def main():
     processed = preprocess_for_hebrew_ocr(
         args.input,
         block_size=args.block_size,
-        c_value=args.c_value
+        c_value=args.c_value,
+        enhance=args.enhance_contrast
     )
+    if args.enhance_contrast:
+        print("  Applied CLAHE contrast enhancement")
 
     if args.remove_borders:
         processed = remove_borders(processed)
