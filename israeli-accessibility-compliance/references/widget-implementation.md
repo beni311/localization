@@ -1,6 +1,6 @@
 # Accessibility Preferences Widget: Implementation Reference
 
-Copy-pasteable TypeScript/React code for a Regulation 35 / IS 5568 / WCAG 2.0 AA accessibility preferences widget.
+Copy-pasteable TypeScript/React code for a Regulation 35 / IS 5568 accessibility preferences widget. IS 5568 is anchored to WCAG 2.0 AA (it adds some 2.1-aligned criteria; sources differ).
 
 **Consult this file when** the user wants to ship the widget itself, not just audit an existing site. The main `SKILL.md` covers compliance guidance; this file covers the implementation.
 

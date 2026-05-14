@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Run IS 5568 accessibility audit on Israeli websites.
 
-Checks for Israeli-specific accessibility requirements based on
-IS 5568 standard and WCAG 2.0 AA, including Hebrew language
-declaration, RTL direction, ARIA labels, and mandatory accessibility
-statement page.
+Checks for Israeli-specific accessibility requirements based on the
+IS 5568 standard, which is anchored to WCAG 2.0 AA (IS 5568 adds some
+2.1-aligned criteria; sources differ). Covers Hebrew language
+declaration, RTL direction, ARIA labels, and the mandatory
+accessibility statement page.
 
 Usage:
     python audit_a11y.py --url https://example.co.il
