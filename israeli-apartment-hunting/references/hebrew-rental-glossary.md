@@ -79,7 +79,7 @@ This glossary covers 80+ Hebrew terms commonly encountered when searching for, v
 | צ'קים | chekim | Checks | Post-dated checks (common payment method) |
 | הוראת קבע | hora'at keva | Standing order | Automatic bank payment |
 | קבלה | kabala | Receipt | Proof of payment |
-| מע"מ | ma'am (VAT) | VAT | Value Added Tax (17%), applies to broker fees |
+| מע"מ | ma'am (VAT) | VAT | Value Added Tax (18% as of January 1, 2025; was 17% previously), applies to broker fees |
 | הצמדה למדד | hatzmada lamadad | Index-linked (CPI) | Rent increase tied to Consumer Price Index |
 
 ## Lease and Legal Terms

@@ -88,11 +88,13 @@ PARKING_COSTS = {
     "other": {"low": 200, "high": 400},
 }
 
-# Oleh arnona discount
+# Oleh arnona discount: up to 90% on the first 100 sqm, for 12 months chosen
+# out of the first 24 months from population-registry registration.
+# Continuation rates after the discount period are set by each municipality
+# individually — there is no universal "year-2" rate, so we don't apply one.
 OLEH_DISCOUNT = {
-    "year_1": 0.90,  # 90% discount
-    "year_2": 0.70,  # 70% discount (varies by municipality)
-    "description": "New olim may receive up to 90% arnona discount in year 1",
+    "year_1": 0.90,  # 90% discount on the first 100 sqm portion only
+    "description": "Olim may receive up to 90% arnona discount on the first 100 sqm for 12 months of the first 24 months. Year-2 rate varies by municipality — check locally.",
 }
 
 VALID_CITIES = list(ARNONA_RATES.keys())
@@ -110,13 +112,19 @@ def calculate_budget(rent, city, rooms, oleh=False, oleh_year=1, parking=False, 
     annual_arnona = city_data["rate_per_sqm"] * sqm
     if oleh:
         if oleh_year == 1:
-            discount = OLEH_DISCOUNT["year_1"]
-        elif oleh_year == 2:
-            discount = OLEH_DISCOUNT["year_2"]
+            # 90% discount on the first 100 sqm portion only. Beyond 100 sqm
+            # the full rate applies. Apportion accordingly.
+            discounted_sqm = min(sqm, 100)
+            full_rate_sqm = max(sqm - 100, 0)
+            discounted_portion = city_data["rate_per_sqm"] * discounted_sqm * (1 - OLEH_DISCOUNT["year_1"])
+            full_portion = city_data["rate_per_sqm"] * full_rate_sqm
+            annual_arnona_after_discount = discounted_portion + full_portion
+            arnona_discount = annual_arnona - annual_arnona_after_discount
         else:
-            discount = 0
-        arnona_discount = annual_arnona * discount
-        annual_arnona_after_discount = annual_arnona - arnona_discount
+            # Year-2+ rates vary by municipality; we don't apply an assumed
+            # discount. Tell the user to check with the municipality.
+            arnona_discount = 0
+            annual_arnona_after_discount = annual_arnona
     else:
         arnona_discount = 0
         annual_arnona_after_discount = annual_arnona
@@ -247,8 +255,8 @@ def format_result(result):
     # One-time costs section
     lines.append("")
     lines.append("  ONE-TIME MOVE-IN COSTS (estimated):")
-    broker_fee = result["rent"] * 1.17  # rent + VAT
-    lines.append(f"    Broker fee (if applicable):   {broker_fee:>8,.0f} NIS (1 month + 17% VAT)")
+    broker_fee = result["rent"] * 1.18  # rent + 18% VAT (Israeli VAT rate as of Jan 2025)
+    lines.append(f"    Broker fee (if applicable):   {broker_fee:>8,.0f} NIS (1 month + 18% VAT, current VAT rate as of Jan 2025)")
     lines.append(f"    Security deposit (1-3 months): {result['rent']:>7,}-{result['rent'] * 3:,} NIS")
     lines.append(f"    First month rent:             {result['rent']:>8,} NIS")
     move_in_low = result["rent"] * 2  # first month + 1 month deposit (no broker)

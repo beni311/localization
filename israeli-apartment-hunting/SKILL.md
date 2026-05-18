@@ -156,7 +156,8 @@ Real estate brokers (metavech, מתווך) are common in the Israeli market. Und
 | Who pays | Usually the tenant (unless listing states otherwise) |
 | When fee is due | Upon signing the lease |
 | Fee negotiability | Sometimes negotiable, especially for expensive apartments |
-| Legal requirement | Broker must have a valid license from the Ministry of Justice |
+| Legal requirement | Broker must have a valid license from the Ministry of Justice Registrar of Real Estate Brokers |
+| 2024 ethics regulations | Real Estate Brokers Regulations (Ethics and Professional Duties) 2024 took effect March 9, 2025. Mandatory disclosure, prohibition on extra fees beyond agreed brokerage, multi-representation disclosure required, written heskem tivuch signed by client BEFORE any fee is owed. A broker who didn't get you to sign a heskem tivuch is not entitled to a fee, even if they showed you the apartment. |
 
 **When a broker is worthwhile:**
 - You have limited Hebrew and need language assistance
@@ -196,10 +197,24 @@ Landlords and brokers typically require specific documents. Having these ready a
 - New olim without local guarantors can sometimes use a bank guarantee (arevut bankit, ערבות בנקאית) instead
 - Bank guarantee typically equals 3-6 months rent, held by the bank
 
-**Security deposits:**
-- Common deposit amounts: 1-3 months rent
-- Can be in the form of a bank guarantee, post-dated checks, or promissory note (shtarat chov, שטר חוב)
-- Deposit should be returned within 60 days of lease end if no damages
+**Security deposits (Chok Schirut Hogenet caps):**
+- Statutory ceiling: the LOWER of (3 months rent) or (1/3 of total lease period). Anything beyond that is unenforceable.
+- Can be in the form of a bank guarantee (arevut bankit), post-dated checks, or promissory note (shtarat chov, שטר חוב)
+- Must be returned within 60 days of lease end if no damages; any deductions should be itemized for the tenant in writing
+
+### Step 7.5: Tenant Rights Under Chok Schirut Hogenet (Fair Rental Law)
+
+Chok Schirut Hogenet (2017, חוק שכירות הוגנת) is the baseline tenant-protection statute. Most landlord templates predate or ignore parts of it. Know what is non-waivable.
+
+| Right | What It Means |
+|-------|---------------|
+| Minimum habitability | Apartment must have running water, electricity, drainage, ventilation, locking doors, and mamad access (for buildings post-1992). Below this standard the unit is not legally rentable |
+| Deposit cap | Lower of (3 months rent) or (1/3 of total lease period). Demands above this are void |
+| Repair-deduction right | If landlord fails to repair an essential defect after written notice, tenant may have the repair done and deduct the cost from rent. Statutory windows: roughly 30 days for non-urgent defects, ~3 days for urgent defects |
+| Itemized return | Deposit deductions at lease end should be itemized for the tenant; landlord may not withhold without justification |
+| Standard Lease (chozeh matzui) | Ministry of Justice has been working on a default-clause "standard lease" that would fill in gaps when parties have no written contract or omit terms. Treat as a default safety net, not as mandatory clauses that override what the parties agreed in writing |
+
+If a landlord's template contradicts Chok Schirut Hogenet, the statute wins — non-compliant clauses are unenforceable, not the entire lease.
 
 ### Step 8: Neighborhood Guide Considerations
 
@@ -231,7 +246,7 @@ Arnona rates vary significantly between cities and even between neighborhoods. T
 | Netanya | NIS 3,000-4,500 |
 
 **New olim arnona discount:**
-New immigrants (olim chadashim, עולים חדשים) may be eligible for arnona discounts of up to 90% in the first year, decreasing over subsequent years. Apply through the local municipality with your oleh certificate (teudat oleh, תעודת עולה).
+New immigrants (olim chadashim, עולים חדשים) may be eligible for an arnona discount of up to 90% — but only for the first 100 sqm of the apartment, and only for 12 chosen months out of the first 24 months from population-registry registration. Continuation rates after the discounted period are set by each municipality individually (no universal "year-2 rate"). Apply through the local municipality with your oleh certificate (teudat oleh, תעודת עולה).
 
 ## Examples
 
@@ -317,4 +332,4 @@ Solution:
 1. Document apartment condition with photos/video at move-in and move-out
 2. Landlord must provide itemized list of deductions within 60 days
 3. If unjustified, send a formal demand letter (michtav derishah, מכתב דרישה)
-4. File a claim in Small Claims Court (beit mishpat letvi'ot ktanot, בית משפט לתביעות קטנות) for amounts up to NIS 35,800
+4. File a claim in Small Claims Court (beit mishpat letvi'ot ktanot, בית משפט לתביעות קטנות) for amounts up to NIS 39,900 (current ceiling effective January 1, 2026)
