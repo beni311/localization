@@ -12,7 +12,7 @@
 - [ ] **Teudat Ravakut** (Certificate of Bachelorhood) -- only needed if registering outside your city of residence
   - Obtained from your local Rabbinate with: Teudat Zehut, passport photos, parents' ketuba, 2 witnesses
 - [ ] **Venue kashrut certificate** -- must be from the local Religious Council (Rabbinate kashrut), NOT private kashrut (Badatz, Mehadrin, etc.)
-- [ ] **Registration fee** -- ~700 NIS
+- [ ] **Registration fee** -- 730-844 NIS depending on city (typically ~824 NIS in 2026); 40% discount available (430-506 NIS) for olim within 2 years, IDF/national service, students under 30, persons with disabilities
 
 ### Additional Documents (if applicable)
 
