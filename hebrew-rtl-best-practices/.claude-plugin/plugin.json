@@ -1,0 +1,7 @@
+{
+    "name": "hebrew-rtl-best-practices",
+    "version": "1.3.0",
+    "description": "Implement right-to-left (RTL) layouts for Hebrew web applications",
+    "author": { "name": "skills-il" },
+    "license": "MIT"
+}
