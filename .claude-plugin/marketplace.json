@@ -1,0 +1,28 @@
+{
+    "name": "localization-il-marketplace",
+    "owner": {
+          "name": "skills-il"
+    },
+    "plugins": [
+          {
+                  "name": "israeli-ui-design-system",
+                  "source": "./israeli-ui-design-system",
+                  "description": "מערכת עיצוב ישראלית עם תמיכת RTL ופונטים עבריים"
+          },
+          {
+                  "name": "hebrew-rtl-best-practices",
+                  "source": "./hebrew-rtl-best-practices",
+                  "description": "נהלי RTL לאתרים ואפליקציות בעברית"
+          },
+          {
+                  "name": "hebrew-tailwind-preset",
+                  "source": "./hebrew-tailwind-preset",
+                  "description": "הגדרות Tailwind CSS לעברית ו-RTL"
+          },
+          {
+                  "name": "israeli-accessibility-compliance",
+                  "source": "./israeli-accessibility-compliance",
+                  "description": "נגישות לאתרים ישראליים לפי תקן IS 5568"
+          }
+    ]
+}
