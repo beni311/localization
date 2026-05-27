@@ -1,0 +1,7 @@
+{
+    "name": "hebrew-tailwind-preset",
+    "version": "1.0.4",
+    "description": "Configure Tailwind CSS v4 for Hebrew RTL applications with dir variants, Hebrew font stacks, and logical property utilities",
+    "author": { "name": "skills-il" },
+    "license": "MIT"
+}
